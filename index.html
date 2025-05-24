@@ -3,31 +3,109 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📚 My Study Portal</title>
+  <title>Study Portal</title>
   <style>
-    body { font-family: sans-serif; padding: 2em; background: #f7f7f7; }
+    body { font-family: sans-serif; padding: 1rem; background: #f9f9f9; }
     h1 { color: #333; }
     ul { list-style: none; padding: 0; }
-    li { margin: 1em 0; }
-    a {
-      display: inline-block;
-      padding: 0.5em 1em;
-      background: #4CAF50;
-      color: white;
-      text-decoration: none;
-      border-radius: 10px;
-    }
-    a:hover {
-      background: #45a049;
-    }
+    li { margin: 8px 0; }
+    img.icon { width: 20px; vertical-align: middle; margin-right: 5px; }
+    input[type="text"] { padding: 5px; width: 70%; }
+    button { margin-left: 5px; padding: 5px 10px; }
+    .progress-bar { background: #ddd; border-radius: 10px; width: 100%; height: 20px; margin: 10px 0; }
+    .progress { background: #4caf50; height: 100%; border-radius: 10px; width: 0%; }
   </style>
 </head>
 <body>
-  <h1>📚 勉強ポータル</h1>
-  <ul>
-    <li><a href="https://docs.google.com/spreadsheets/d/xxxx" target="_blank">会計学シート</a></li>
-    <li><a href="https://docs.google.com/spreadsheets/d/yyyy" target="_blank">英単語テスト</a></li>
-    <li><a href="https://docs.google.com/spreadsheets/d/zzzz" target="_blank">週間学習記録</a></li>
-  </ul>
+
+<h1>📚 My Study Portal</h1>
+
+<!-- 📅 日付 -->
+<p id="today"></p>
+
+<!-- 📊 Googleスプレッドシート -->
+<h2>🔗 学習シート</h2>
+<ul>
+  <li><a href="https://docs.google.com/spreadsheets/d/abc123" target="_blank"><img src="https://img.icons8.com/emoji/48/notebook-emoji.png" class="icon">会計学</a></li>
+  <li><a href="https://docs.google.com/spreadsheets/d/def456" target="_blank"><img src="https://img.icons8.com/emoji/48/notebook-emoji.png" class="icon">英単語</a></li>
+  <li><a href="https://docs.google.com/spreadsheets/d/ghi789" target="_blank"><img src="https://img.icons8.com/emoji/48/notebook-emoji.png" class="icon">週間記録</a></li>
+</ul>
+
+<!-- ⏱️ タイマー -->
+<h2>⏱️ 学習タイマー</h2>
+<p>経過時間: <span id="timer">0</span> 秒</p>
+<button onclick="startTimer()">スタート</button>
+<button onclick="stopTimer()">ストップ</button>
+
+<!-- ✅ ToDo -->
+<h2>✅ 学習ToDoリスト</h2>
+<input type="text" id="todo-input" placeholder="例：Chapter 3 を読む">
+<button onclick="addTodo()">追加</button>
+<ul id="todo-list"></ul>
+
+<!-- 📈 進捗バー -->
+<h2>📈 勉強の進捗</h2>
+<input type="range" id="progressRange" min="0" max="100" value="0" onchange="updateProgress()">
+<div class="progress-bar">
+  <div id="progress" class="progress"></div>
+</div>
+<p>進捗: <span id="progressValue">0%</span></p>
+
+<script>
+  // 日付表示
+  document.getElementById("today").textContent =
+    "📅 今日: " + new Date().toLocaleDateString("ja-JP", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  // タイマー機能
+  let timer = 0;
+  let intervalId = null;
+  function startTimer() {
+    if (!intervalId) {
+      intervalId = setInterval(() => {
+        timer++;
+        document.getElementById('timer').textContent = timer;
+      }, 1000);
+    }
+  }
+  function stopTimer() {
+    clearInterval(intervalId);
+    intervalId = null;
+  }
+
+  // ToDoリスト
+  const input = document.getElementById('todo-input');
+  const list = document.getElementById('todo-list');
+  const savedTodos = JSON.parse(localStorage.getItem('todos') || '[]');
+  savedTodos.forEach(text => addTodoItem(text));
+
+  function addTodo() {
+    const text = input.value.trim();
+    if (text) {
+      addTodoItem(text);
+      input.value = '';
+      saveTodos();
+    }
+  }
+
+  function addTodoItem(text) {
+    const li = document.createElement('li');
+    li.textContent = text;
+    li.onclick = () => { li.remove(); saveTodos(); };
+    list.appendChild(li);
+  }
+
+  function saveTodos() {
+    const todos = Array.from(list.children).map(li => li.textContent);
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }
+
+  // 進捗バー
+  function updateProgress() {
+    const value = document.getElementById('progressRange').value;
+    document.getElementById('progress').style.width = value + '%';
+    document.getElementById('progressValue').textContent = value + '%';
+  }
+</script>
+
 </body>
 </html>
